@@ -11,7 +11,9 @@ namespace Rebus.Firebird;
 /// should commit/rollback the transaction (depending on whether <see cref="Complete"/> is called before <see cref="Dispose()"/>), or if the transaction
 /// is handled outside of the wrapper
 /// </remarks>
-public sealed class DbConnectionWrapper(FbConnection connection, FbTransaction? currentTransaction, bool managedExternally) :
+public sealed class DbConnectionWrapper(FbConnection connection,
+	FbTransaction? currentTransaction,
+	bool managedExternally) :
 	IDbConnection
 {
 	private readonly FbConnection _connection = connection;
@@ -54,7 +56,7 @@ public sealed class DbConnectionWrapper(FbConnection connection, FbTransaction? 
 
 		if (_currentTransaction is not null)
 		{
-			using (_currentTransaction)
+			await using (_currentTransaction)
 			{
 				await _currentTransaction.CommitAsync();
 				_currentTransaction = null;
@@ -68,8 +70,10 @@ public sealed class DbConnectionWrapper(FbConnection connection, FbTransaction? 
 	/// </summary>
 	public void Dispose()
 	{
-		if (_managedExternally) return;
-		if (_disposed) return;
+		if (_managedExternally)
+			return;
+		if (_disposed)
+			return;
 
 		try
 		{

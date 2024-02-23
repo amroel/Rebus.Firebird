@@ -1,5 +1,4 @@
-﻿using System.Data;
-using FirebirdSql.Data.FirebirdClient;
+﻿using FirebirdSql.Data.FirebirdClient;
 
 namespace Rebus.Firebird;
 
@@ -28,7 +27,6 @@ public class FirebirdConnectionHelper : IProvideFirebirdConnection
 		_additionalConnectionSetupCallback = additionalConnectionSetupCallback;
 	}
 
-
 	/// <summary>
 	/// Gets a fresh, open and ready-to-use connection wrapper
 	/// </summary>
@@ -47,7 +45,12 @@ public class FirebirdConnectionHelper : IProvideFirebirdConnection
 		}
 		else
 		{
-			FbTransaction currentTransaction = connection.BeginTransaction(IsolationLevel.ReadCommitted);
+			FbTransactionOptions transactionOptions = new()
+			{
+				TransactionBehavior = FbTransactionBehavior.ReadCommitted | FbTransactionBehavior.Wait,
+				WaitTimeout = TimeSpan.FromSeconds(1)
+			};
+			FbTransaction currentTransaction = connection.BeginTransaction(transactionOptions);
 			return new FirebirdConnection(connection, currentTransaction);
 		}
 	}

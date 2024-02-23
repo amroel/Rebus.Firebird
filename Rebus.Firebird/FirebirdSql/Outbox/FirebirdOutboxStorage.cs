@@ -15,7 +15,7 @@ namespace Rebus.Firebird.FirebirdSql.Outbox;
 public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> connectionProvider, TableName tableName)
 	: IOutboxStorage, IInitializable
 {
-	private static readonly HeaderSerializer HeaderSerializer = new();
+	private static readonly HeaderSerializer _headerSerializer = new();
 	private readonly Func<ITransactionContext, IDbConnection> _connectionProvider = connectionProvider
 		?? throw new ArgumentNullException(nameof(connectionProvider));
 	private readonly TableName _tableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
@@ -53,7 +53,7 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 
 				await command.ExecuteNonQueryAsync();
 
-				command.CommandText = "create sequence rebus_outbox_seq";
+				command.CommandText = $"create or alter sequence {_tableName}_seq restart";
 				await command.ExecuteNonQueryAsync();
 
 				await connection.Complete();
@@ -109,7 +109,7 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 			// no 'using' here either, because this will be passed to the outbox message batch
 			IDbConnection connection = _connectionProvider(scope.TransactionContext);
 
-			// this must be done when cleanining up
+			// this must be done when cleaning up
 			void Dispose()
 			{
 				connection.Dispose();
@@ -180,7 +180,7 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 				)
 				values 
 				(
-					next value for rebus_outbox_seq, 
+					next value for {_tableName}_seq, 
 					@correlationId, 
 					@messageId, 
 					@sourceQueue, 
@@ -258,15 +258,15 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 		{
 			var id = (long)reader["id"];
 			var destinationAddress = (string)reader["destination_address"];
-			Dictionary<string, string> headers = HeaderSerializer.DeserializeFromString((string)reader["headers"]);
+			Dictionary<string, string> headers = _headerSerializer.DeserializeFromString((string)reader["headers"]);
 			var body = (byte[])reader["body"];
 			messages.Add(new OutboxMessage(id, destinationAddress, headers, body));
 		}
 
 		if (messages.Count > 0)
 		{
-			var idsToDelete = string.Join(", ", messages.Select((m, index) => $"@id{index}"));
-			command.CommandText = $"delete from {_tableName} where id in ({idsToDelete})";
+			var idParams = string.Join(", ", messages.Select((m, index) => $"@id{index}"));
+			command.CommandText = $"delete from {_tableName} where id in ({idParams})";
 			command.Parameters.Clear();
 			for (var i = 0; i < messages.Count; i++)
 			{
@@ -279,5 +279,5 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 	}
 
 	private static string SerializeHeaders(Dictionary<string, string> headers)
-		=> HeaderSerializer.SerializeToString(headers);
+		=> _headerSerializer.SerializeToString(headers);
 }

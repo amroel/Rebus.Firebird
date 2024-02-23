@@ -21,14 +21,8 @@ public class InsideRebusHandlerTests : FixtureBase
 	protected override void SetUp()
 	{
 		base.SetUp();
-
-		_network = new InMemNetwork();
-	}
-
-	protected override void TearDown()
-	{
 		FbTestHelper.DropTable("RebusOutbox");
-		base.TearDown();
+		_network = new InMemNetwork();
 	}
 
 	private record SomeMessage;

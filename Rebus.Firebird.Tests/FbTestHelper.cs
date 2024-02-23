@@ -8,7 +8,7 @@ using Rebus.Tests.Contracts;
 namespace Rebus.Firebird.Tests;
 internal sealed class FbTestHelper
 {
-	private const int TableUnknown = 335544580;
+	private const int TableUnknown = 336397206;
 	private static FirebirdContainer? firebirdContainer;
 	private static readonly FirebirdConnectionHelper FirebirdConnectionHelper = new(ConnectionString);
 
@@ -35,7 +35,6 @@ internal sealed class FbTestHelper
 			Console.WriteLine("Using firebird SQL database {0}", databaseName);
 			_connectionString = new FbConnectionStringBuilder(firebirdContainer?.GetConnectionString())
 			{
-				Pooling = false,
 				Charset = "UTF8"
 			}.ToString();
 
