@@ -14,22 +14,12 @@ public interface IDbConnection : IDisposable
 	FbCommand CreateCommand();
 
 	/// <summary>
-	/// Gets the names of all the tables in the current database
+	/// finds out whether the table given by [<paramref name="candidate"/>] exists
 	/// </summary>
-	IEnumerable<TableName> GetTableNames();
+	bool TableExists(TableName candidate);
 
 	/// <summary>
 	/// Marks that all work has been successfully done and the <see cref="FbConnection"/> may have its transaction committed or whatever is natural to do at this time
 	/// </summary>
 	Task Complete();
-
-	/// <summary>
-	/// Gets information about the columns in the table given by [<paramref name="dataTableName"/>]
-	/// </summary>
-	IEnumerable<DbColumn> GetColumns(string dataTableName);
 }
-
-/// <summary>
-/// Represents a Firebird Sql column
-/// </summary>
-public sealed record DbColumn(string Name, FbDbType Type);

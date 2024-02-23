@@ -3,9 +3,11 @@
 /// <summary>
 /// Represents a table name in Firebird Sql
 /// </summary>
-public sealed class TableName(string tableName)
+public sealed record TableName
 {
-	public string Name { get; } = StripQuotes(tableName);
+	public TableName(string tableName) => Name = StripQuotes(tableName).ToUpperInvariant();
+
+	public string Name { get; }
 
 	public override string ToString() => Name;
 

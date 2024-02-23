@@ -22,9 +22,13 @@ public class InsideRebusHandlerTests : FixtureBase
 	{
 		base.SetUp();
 
-		FbTestHelper.DropTable("RebusOutbox");
-
 		_network = new InMemNetwork();
+	}
+
+	protected override void TearDown()
+	{
+		FbTestHelper.DropTable("RebusOutbox");
+		base.TearDown();
 	}
 
 	private record SomeMessage;
@@ -50,9 +54,13 @@ public class InsideRebusHandlerTests : FixtureBase
 			activator => activator.Handle<SomeMessage>(HandlerFunction),
 			flakySenderTransportDecoratorSettings);
 		using IBus secondConsumer = CreateConsumer("secondConsumer",
-			activator => activator.Handle<AnotherMessage>(async _ => gotAnotherMessage.Set()));
+			activator => activator.Handle<AnotherMessage>(_ =>
+			{
+				gotAnotherMessage.Set();
+				return Task.CompletedTask;
+			}));
 
-		using var client = CreateOneWayClient(router => router.TypeBased().Map<SomeMessage>("firstConsumer"));
+		using IBus client = CreateOneWayClient(router => router.TypeBased().Map<SomeMessage>("firstConsumer"));
 
 		// make it so that the first consumer cannot send
 		flakySenderTransportDecoratorSettings.SuccessRate = 0;

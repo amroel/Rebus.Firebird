@@ -1,5 +1,4 @@
-﻿using System.Data;
-using FirebirdSql.Data.FirebirdClient;
+﻿using FirebirdSql.Data.FirebirdClient;
 using Rebus.Exceptions;
 
 namespace Rebus.Firebird;
@@ -31,31 +30,13 @@ public sealed class DbConnectionWrapper(FbConnection connection, FbTransaction? 
 	}
 
 	/// <summary>
-	/// Gets the names of all the tables in the current database for the current schema
+	/// finds out whether the table given by [<paramref name="candidate"/>] exists
 	/// </summary>
-	public IEnumerable<TableName> GetTableNames()
+	public bool TableExists(TableName candidate)
 	{
 		try
 		{
-			return _connection.GetTableNames(_currentTransaction);
-		}
-		catch (FbException exception)
-		{
-			throw new RebusApplicationException(exception, "Could not get table names");
-		}
-	}
-
-	/// <summary>
-	/// Gets information about the columns in the table given by <paramref name="dataTableName"/>
-	/// </summary>
-	public IEnumerable<DbColumn> GetColumns(string dataTableName)
-	{
-		try
-		{
-			return _connection
-				.GetColumns(dataTableName, _currentTransaction)
-				.Select(kvp => new DbColumn(kvp.Key, kvp.Value))
-				.ToList();
+			return _connection.TableExists(candidate, _currentTransaction);
 		}
 		catch (FbException exception)
 		{
