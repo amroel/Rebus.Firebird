@@ -29,7 +29,13 @@ public class FirebirdOutboxStorageTests : FixtureBase
 		TransportMessage transportMessage = new([], [1, 2, 3]);
 		OutgoingTransportMessage outgoingMessage = new(transportMessage, "wherever");
 
-		await _storage.Save(new[] { outgoingMessage });
+		using RebusTransactionScope scope = new();
+		using DbConnectionWrapper connection = GetNewDbConnection(scope.TransactionContext);
+
+		await _storage.Save(new[] { outgoingMessage }, connection);
+
+		await connection.Complete();
+		await scope.CompleteAsync();
 
 		using OutboxMessageBatch outboxMessageBatch = await _storage.GetNextMessageBatch();
 
@@ -90,7 +96,13 @@ public class FirebirdOutboxStorageTests : FixtureBase
 		TransportMessage transportMessage = new([], [1, 2, 3]);
 		OutgoingTransportMessage outgoingMessage = new(transportMessage, "wherever");
 
-		await _storage.Save(new[] { outgoingMessage });
+		using RebusTransactionScope scope = new();
+		using DbConnectionWrapper connection = GetNewDbConnection(scope.TransactionContext);
+
+		await _storage.Save(new[] { outgoingMessage }, connection);
+
+		await connection.Complete();
+		await scope.CompleteAsync();
 
 		using OutboxMessageBatch batch1 = await _storage.GetNextMessageBatch();
 		await batch1.Complete();
@@ -113,9 +125,14 @@ public class FirebirdOutboxStorageTests : FixtureBase
 			OutgoingTransportMessage outgoingMessage1 = new(transportMessage, "wherever");
 			return outgoingMessage1;
 		}
+		using RebusTransactionScope scope = new();
+		using DbConnectionWrapper connection = GetNewDbConnection(scope.TransactionContext);
 
 		List<string> texts = Enumerable.Range(0, 100).Select(n => $"message {n:000}").ToList();
-		await _storage.Save(texts.Select(CreateOutgoingMessage));
+		await _storage.Save(texts.Select(CreateOutgoingMessage), connection);
+
+		await connection.Complete();
+		await scope.CompleteAsync();
 
 		using (OutboxMessageBatch batch1 = await _storage.GetNextMessageBatch(maxMessageBatchSize: 10))
 			Assert.That(batch1, Has.Count.EqualTo(10));
@@ -139,10 +156,14 @@ public class FirebirdOutboxStorageTests : FixtureBase
 			OutgoingTransportMessage outgoingMessage1 = new(transportMessage, "wherever");
 			return outgoingMessage1;
 		}
+		using RebusTransactionScope scope = new();
+		using DbConnectionWrapper connection = GetNewDbConnection(scope.TransactionContext);
 
 		List<string> texts = Enumerable.Range(0, 200).Select(n => $"message {n:000}").ToList();
+		await _storage.Save(texts.Select(CreateOutgoingMessage), connection);
 
-		await _storage.Save(texts.Select(CreateOutgoingMessage));
+		await connection.Complete();
+		await scope.CompleteAsync();
 
 		using OutboxMessageBatch batch1 = await _storage.GetNextMessageBatch();
 		await batch1.Complete();

@@ -8,17 +8,6 @@ namespace Rebus.Firebird.FirebirdSql.Outbox;
 public interface IOutboxStorage
 {
 	/// <summary>
-	/// Stores the given <paramref name="outgoingMessages"/> as being the result of processing message 
-	/// with ID <paramref name="messageId"/> in the queue of this particular endpoint. 
-	/// If <paramref name="outgoingMessages"/> is an empty sequence, a note is made of the fact
-	/// that the message with ID <paramref name="messageId"/> has been processed.
-	/// </summary>
-	Task Save(IEnumerable<OutgoingTransportMessage> outgoingMessages,
-		string? messageId = null,
-		string? sourceQueue = null,
-		string? correlationId = null);
-
-	/// <summary>
 	/// Stores the given <paramref name="outgoingMessages"/> using the given <paramref name="dbConnection"/>.
 	/// </summary>
 	Task Save(IEnumerable<OutgoingTransportMessage> outgoingMessages, IDbConnection dbConnection);

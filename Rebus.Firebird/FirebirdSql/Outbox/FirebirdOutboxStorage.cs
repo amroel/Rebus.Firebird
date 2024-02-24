@@ -16,9 +16,8 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 	: IOutboxStorage, IInitializable
 {
 	private static readonly HeaderSerializer _headerSerializer = new();
-	private readonly Func<ITransactionContext, IDbConnection> _connectionProvider = connectionProvider
-		?? throw new ArgumentNullException(nameof(connectionProvider));
-	private readonly TableName _tableName = tableName ?? throw new ArgumentNullException(nameof(tableName));
+	private readonly Func<ITransactionContext, IDbConnection> _connectionProvider = connectionProvider;
+	private readonly TableName _tableName = tableName;
 
 	/// <summary>
 	/// Initializes the outbox storage
@@ -71,18 +70,6 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 
 		AsyncHelper.RunSync(InitializeAsync);
 	}
-
-	/// <summary>
-	/// Stores the given <paramref name="outgoingMessages"/> as being the result of processing message with 
-	/// ID <paramref name="messageId"/>
-	/// in the queue of this particular endpoint. 
-	/// If <paramref name="outgoingMessages"/> is an empty sequence, a note is made of the fact
-	/// that the message with ID <paramref name="messageId"/> has been processed.
-	/// </summary>
-	public async Task Save(IEnumerable<OutgoingTransportMessage> outgoingMessages,
-		string? messageId = null,
-		string? sourceQueue = null,
-		string? correlationId = null) => await InnerSave(outgoingMessages, messageId, sourceQueue, correlationId);
 
 	/// <summary>
 	/// Stores the given <paramref name="outgoingMessages"/> using the given <paramref name="dbConnection"/>.
@@ -146,20 +133,6 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 			scope.Dispose();
 			throw;
 		}
-	}
-
-	private async Task InnerSave(IEnumerable<OutgoingTransportMessage> outgoingMessages,
-		string? messageId,
-		string? sourceQueue,
-		string? correlationId)
-	{
-		using RebusTransactionScope scope = new();
-		using IDbConnection connection = _connectionProvider(scope.TransactionContext);
-
-		await SaveUsingConnection(connection, outgoingMessages, messageId, sourceQueue, correlationId);
-
-		await connection.Complete();
-		await scope.CompleteAsync();
 	}
 
 	private async Task SaveUsingConnection(IDbConnection connection,
