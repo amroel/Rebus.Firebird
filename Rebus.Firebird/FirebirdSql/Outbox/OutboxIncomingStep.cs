@@ -6,8 +6,7 @@ namespace Rebus.Firebird.FirebirdSql.Outbox;
 
 internal sealed class OutboxIncomingStep(IProvideOutboxConnection outboxConnectionProvider) : IIncomingStep
 {
-	private readonly IProvideOutboxConnection _outboxConnectionProvider = outboxConnectionProvider
-		?? throw new ArgumentNullException(nameof(outboxConnectionProvider));
+	private readonly IProvideOutboxConnection _outboxConnectionProvider = outboxConnectionProvider;
 
 	public async Task Process(IncomingStepContext context, Func<Task> next)
 	{
@@ -16,11 +15,16 @@ internal sealed class OutboxIncomingStep(IProvideOutboxConnection outboxConnecti
 
 		transactionContext.Items[OutboxExtensions.CurrentOutboxConnectionKey] = outboxConnection;
 
-		transactionContext.OnCommit(async _ => await outboxConnection.Transaction.CommitAsync());
+		transactionContext.OnCommit(async _ =>
+		{
+			if (outboxConnection.Transaction is null)
+				return;
+			await outboxConnection.Transaction.CommitAsync();
+		});
 
 		transactionContext.OnDisposed(_ =>
 		{
-			outboxConnection.Transaction.Dispose();
+			outboxConnection.Transaction?.Dispose();
 			outboxConnection.Connection.Dispose();
 		});
 

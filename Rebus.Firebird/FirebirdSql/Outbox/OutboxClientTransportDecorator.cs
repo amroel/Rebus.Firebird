@@ -8,8 +8,8 @@ namespace Rebus.Firebird.FirebirdSql.Outbox;
 internal class OutboxClientTransportDecorator(ITransport transport, IOutboxStorage outboxStorage) : ITransport
 {
 	private const string OutgoingMessagesKey = "outbox-outgoing-messages";
-	private readonly ITransport _transport = transport ?? throw new ArgumentNullException(nameof(transport));
-	private readonly IOutboxStorage _outboxStorage = outboxStorage ?? throw new ArgumentNullException(nameof(outboxStorage));
+	private readonly ITransport _transport = transport;
+	private readonly IOutboxStorage _outboxStorage = outboxStorage;
 
 	public void CreateQueue(string address) => _transport.CreateQueue(address);
 
@@ -17,7 +17,7 @@ internal class OutboxClientTransportDecorator(ITransport transport, IOutboxStora
 	{
 		OutboxConnection connection = context.GetOrNull<OutboxConnection>(OutboxExtensions.CurrentOutboxConnectionKey);
 
-		if (connection == null)
+		if (connection is null)
 		{
 			return _transport.Send(destinationAddress, message, context);
 		}
@@ -25,7 +25,9 @@ internal class OutboxClientTransportDecorator(ITransport transport, IOutboxStora
 		ConcurrentQueue<OutgoingTransportMessage> outgoingMessages = context.GetOrAdd(OutgoingMessagesKey, () =>
 		{
 			ConcurrentQueue<OutgoingTransportMessage> queue = new();
-			DbConnectionWrapper dbConnectionWrapper = new(connection.Connection, connection.Transaction, managedExternally: true);
+			DbConnectionWrapper dbConnectionWrapper = new(connection.Connection,
+				connection.Transaction,
+				managedExternally: true);
 			context.OnCommit(async _ => await _outboxStorage.Save(queue, dbConnectionWrapper));
 			return queue;
 		});

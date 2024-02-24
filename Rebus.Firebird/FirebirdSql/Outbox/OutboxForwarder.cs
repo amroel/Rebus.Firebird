@@ -67,7 +67,8 @@ internal class OutboxForwarder : IDisposable, IInitializable
 		}
 	}
 
-	private async Task ProcessMessageBatch(IReadOnlyCollection<OutboxMessage> batch, CancellationToken cancellationToken)
+	private async Task ProcessMessageBatch(IReadOnlyCollection<OutboxMessage> batch,
+		CancellationToken cancellationToken)
 	{
 		_logger.Debug("Sending {count} pending messages", batch.Count);
 

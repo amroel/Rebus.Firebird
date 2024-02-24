@@ -73,8 +73,10 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 	}
 
 	/// <summary>
-	/// Stores the given <paramref name="outgoingMessages"/> as being the result of processing message with ID <paramref name="messageId"/>
-	/// in the queue of this particular endpoint. If <paramref name="outgoingMessages"/> is an empty sequence, a note is made of the fact
+	/// Stores the given <paramref name="outgoingMessages"/> as being the result of processing message with 
+	/// ID <paramref name="messageId"/>
+	/// in the queue of this particular endpoint. 
+	/// If <paramref name="outgoingMessages"/> is an empty sequence, a note is made of the fact
 	/// that the message with ID <paramref name="messageId"/> has been processed.
 	/// </summary>
 	public async Task Save(IEnumerable<OutgoingTransportMessage> outgoingMessages,

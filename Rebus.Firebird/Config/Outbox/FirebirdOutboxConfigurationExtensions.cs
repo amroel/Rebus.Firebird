@@ -15,10 +15,12 @@ public static class FirebirdOutboxConfigurationExtensions
 {
 	/// <summary>
 	/// Configures Rebus to use an outbox.
-	/// This will store a (message ID, source queue) tuple for all processed messages, and under this tuple any messages sent/published will
-	/// also be stored, thus enabling truly idempotent message processing.
+	/// This will store a (message ID, source queue) tuple for all processed messages, 
+	/// and under this tuple any messages sent/published will also be stored, 
+	/// thus enabling truly idempotent message processing.
 	/// </summary>
-	public static RebusConfigurer Outbox(this RebusConfigurer configurer, Action<StandardConfigurer<IOutboxStorage>> configure)
+	public static RebusConfigurer Outbox(this RebusConfigurer configurer,
+		Action<StandardConfigurer<IOutboxStorage>> configure)
 	{
 		ArgumentNullException.ThrowIfNull(configurer);
 		ArgumentNullException.ThrowIfNull(configure);
@@ -27,10 +29,13 @@ public static class FirebirdOutboxConfigurationExtensions
 		{
 			configure(StandardConfigurer<IOutboxStorage>.GetConfigurerFrom(o));
 
-			// if no outbox storage was registered, no further calls must have been made... that's ok, so we just bail out here
-			if (!o.Has<IOutboxStorage>()) return;
+			// if no outbox storage was registered, no further calls must have been made...
+			// that's ok, so we just bail out here
+			if (!o.Has<IOutboxStorage>())
+				return;
 
-			o.Decorate<ITransport>(c => new OutboxClientTransportDecorator(c.Get<ITransport>(), c.Get<IOutboxStorage>()));
+			o.Decorate<ITransport>(c
+				=> new OutboxClientTransportDecorator(c.Get<ITransport>(), c.Get<IOutboxStorage>()));
 
 			o.Register(c =>
 			{
