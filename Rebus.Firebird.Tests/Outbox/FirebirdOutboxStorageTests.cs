@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using FirebirdSql.Data.FirebirdClient;
+using Rebus.Firebird.FirebirdSql;
 using Rebus.Firebird.FirebirdSql.Outbox;
 using Rebus.Messages;
 using Rebus.Tests.Contracts;

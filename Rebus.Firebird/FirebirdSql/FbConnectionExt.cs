@@ -1,6 +1,6 @@
 ﻿using FirebirdSql.Data.FirebirdClient;
 
-namespace Rebus.Firebird;
+namespace Rebus.Firebird.FirebirdSql;
 public static class FbConnectionExt
 {
 	private static readonly string[] tableName = ["RDB$RELATION_NAME"];

@@ -1,4 +1,4 @@
-﻿namespace Rebus.Firebird;
+﻿namespace Rebus.Firebird.FirebirdSql;
 
 /// <summary>
 /// Represents a table name in Firebird Sql

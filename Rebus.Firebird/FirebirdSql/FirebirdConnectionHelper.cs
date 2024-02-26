@@ -1,6 +1,6 @@
 ﻿using FirebirdSql.Data.FirebirdClient;
 
-namespace Rebus.Firebird;
+namespace Rebus.Firebird.FirebirdSql;
 
 /// <summary>
 /// Helps with managing <see cref="FbConnection"/>s

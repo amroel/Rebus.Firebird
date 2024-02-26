@@ -1,4 +1,4 @@
-﻿namespace Rebus.Firebird;
+﻿namespace Rebus.Firebird.FirebirdSql;
 
 internal static class MathExtensions
 {

@@ -1,5 +1,5 @@
 ﻿using FirebirdSql.Data.FirebirdClient;
-using Rebus.Firebird;
+using Rebus.Firebird.FirebirdSql;
 using Rebus.Firebird.FirebirdSql.Outbox;
 using Rebus.Transport;
 

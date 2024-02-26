@@ -1,6 +1,6 @@
 ﻿using FirebirdSql.Data.FirebirdClient;
 
-namespace Rebus.Firebird;
+namespace Rebus.Firebird.FirebirdSql;
 
 /// <summary>
 /// Wrapper of <see cref="FbConnection"/> that allows for easily changing how transactions are handled, and possibly how <see cref="FbConnection"/> instances

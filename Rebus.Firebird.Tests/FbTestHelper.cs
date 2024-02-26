@@ -1,6 +1,7 @@
 ﻿using DotNet.Testcontainers.Builders;
 using FirebirdSql.Data.FirebirdClient;
 using Rebus.Exceptions;
+using Rebus.Firebird.FirebirdSql;
 using Rebus.Firebird.Internals;
 using Rebus.Firebird.Tests.Testcontainers.Firebird;
 using Rebus.Tests.Contracts;

@@ -1,4 +1,4 @@
-﻿namespace Rebus.Firebird;
+﻿namespace Rebus.Firebird.FirebirdSql;
 
 /// <summary>
 /// Mini-Polly 🙂

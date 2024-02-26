@@ -1,7 +1,7 @@
 ﻿using FirebirdSql.Data.FirebirdClient;
 using Rebus.Exceptions;
 
-namespace Rebus.Firebird;
+namespace Rebus.Firebird.FirebirdSql;
 
 /// <summary>
 /// Wrapper of <see cref="FbConnection"/> that allows for either handling <see cref="FbTransaction"/> automatically, or for handling it externally
