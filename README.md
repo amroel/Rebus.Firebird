@@ -1,4 +1,4 @@
-# Rebus.PostgreSql
+# Rebus.Firebird
 
 [![install from nuget](https://img.shields.io/nuget/v/Rebus.Firebird.svg?style=flat-square)](https://www.nuget.org/packages/Rebus.Firebird)
 
