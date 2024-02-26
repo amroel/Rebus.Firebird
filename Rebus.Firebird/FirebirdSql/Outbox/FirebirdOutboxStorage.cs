@@ -45,8 +45,7 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 					    source_queue varchar(255),
 					    destination_address varchar(255) not null,
 					    headers blob sub_type text,
-					    body blob sub_type binary,
-					    sent boolean default false not null
+					    body blob sub_type binary
 					)
 					""";
 
