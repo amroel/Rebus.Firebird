@@ -116,6 +116,7 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 				// define what it means to complete the batch
 				async Task Complete()
 				{
+					await DeleteMessages(connection, messages);
 					await connection.Complete();
 					await scope.CompleteAsync();
 				}
@@ -186,6 +187,17 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 		}
 	}
 
+	private async Task DeleteMessages(IDbConnection connection, IEnumerable<OutboxMessage> messages)
+	{
+		using FbCommand command = connection.CreateCommand();
+
+		var idParams = string.Join(", ", messages.Select(m => m.Id));
+		command.CommandText = $"delete from {_tableName} where id in ({idParams})";
+		var deleted = await command.ExecuteNonQueryAsync();
+
+		await command.ExecuteNonQueryAsync();
+	}
+
 	private async Task<List<OutboxMessage>> GetOutboxMessages(IDbConnection connection,
 		int maxMessageBatchSize,
 		string? correlationId)
@@ -236,18 +248,6 @@ public class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnection> conn
 			Dictionary<string, string> headers = _headerSerializer.DeserializeFromString((string)reader["headers"]);
 			var body = (byte[])reader["body"];
 			messages.Add(new OutboxMessage(id, destinationAddress, headers, body));
-		}
-
-		if (messages.Count > 0)
-		{
-			var idParams = string.Join(", ", messages.Select((m, index) => $"@id{index}"));
-			command.CommandText = $"delete from {_tableName} where id in ({idParams})";
-			command.Parameters.Clear();
-			for (var i = 0; i < messages.Count; i++)
-			{
-				command.Parameters.AddWithValue($"id{i}", messages[i].Id);
-			}
-			var deleted = await command.ExecuteNonQueryAsync();
 		}
 
 		return messages;
