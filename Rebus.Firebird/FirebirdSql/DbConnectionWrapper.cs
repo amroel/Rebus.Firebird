@@ -47,7 +47,8 @@ public sealed class DbConnectionWrapper(FbConnection connection,
 	}
 
 	/// <summary>
-	/// Marks that all work has been successfully done and the <see cref="FbConnection"/> may have its transaction committed or whatever is natural to do at this time
+	/// Marks that all work has been successfully done and the <see cref="FbConnection"/> 
+	/// may have its transaction committed or whatever is natural to do at this time
 	/// </summary>
 	public async Task Complete()
 	{
@@ -65,8 +66,9 @@ public sealed class DbConnectionWrapper(FbConnection connection,
 	}
 
 	/// <summary>
-	/// Finishes the transaction and disposes the connection in order to return it to the connection pool. If the transaction
-	/// has not been committed (by calling <see cref="Complete"/>), the transaction will be rolled back.
+	/// Finishes the transaction and disposes the connection in order to return it to the connection pool. 
+	/// If the transaction has not been committed (by calling <see cref="Complete"/>), 
+	/// the transaction will be rolled back.
 	/// </summary>
 	public void Dispose()
 	{

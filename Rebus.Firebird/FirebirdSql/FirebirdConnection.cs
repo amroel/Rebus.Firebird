@@ -18,8 +18,8 @@ public sealed class FirebirdConnection : IDisposable
 		FbTransaction currentTransaction,
 		bool managedExternally = false)
 	{
-		_currentConnection = currentConnection ?? throw new ArgumentNullException(nameof(currentConnection));
-		_currentTransaction = currentTransaction ?? throw new ArgumentNullException(nameof(currentTransaction));
+		_currentConnection = currentConnection;
+		_currentTransaction = currentTransaction;
 		_managedExternally = managedExternally;
 	}
 
@@ -28,7 +28,7 @@ public sealed class FirebirdConnection : IDisposable
 	/// </summary>
 	public FirebirdConnection(FbConnection currentConnection, bool managedExternally = false)
 	{
-		_currentConnection = currentConnection ?? throw new ArgumentNullException(nameof(currentConnection));
+		_currentConnection = currentConnection;
 		_managedExternally = managedExternally;
 	}
 
