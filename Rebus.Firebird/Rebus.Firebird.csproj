@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://rebus.fm/what-is-rebus/</PackageProjectUrl>
     <PackageDescription>FirebirdSQL outbox persistence for Rebus</PackageDescription>
     <PackageTags>rebus firebird sql firebird</PackageTags>
-    <RepositoryUrl>https://github.com/rebus-org/Rebus</RepositoryUrl>
+    <RepositoryUrl>https://github.com/amroel/Rebus.Firebird</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>little_rebusbus2_copy-500x500.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
