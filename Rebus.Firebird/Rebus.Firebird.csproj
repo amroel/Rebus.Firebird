@@ -17,13 +17,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
-
+  
+  <PropertyGroup>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.0.0" />
+    <PackageReference Include="MinVer" Version="4.3.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Rebus" Version="8.2.2" />
   </ItemGroup>
 
