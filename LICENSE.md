@@ -2,8 +2,6 @@ Rebus is licensed under [The MIT License (MIT)](http://opensource.org/licenses/M
 
 # The MIT License (MIT)
 
-Copyright (c) 2012-2016 Mogens Heller Grabe
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,5 +21,3 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 -------
-
-This license was chosen with the intention of making it easy for everyone to use Rebus. If the license has the opposite effect for your specific usage/organization/whatever, please contact me and we'll see if we can work something out.
