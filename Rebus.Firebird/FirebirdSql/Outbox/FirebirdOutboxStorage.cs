@@ -141,10 +141,7 @@ public sealed class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnectio
 	}
 
 	private async Task SaveUsingConnection(IDbConnection connection,
-		IEnumerable<OutgoingTransportMessage> outgoingMessages,
-		string? messageId = null,
-		string? sourceQueue = null,
-		string? correlationId = null)
+		IEnumerable<OutgoingTransportMessage> outgoingMessages)
 	{
 		using FbCommand command = connection.CreateCommand();
 		command.CommandText = $"""
@@ -170,8 +167,9 @@ public sealed class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnectio
 				)
 				""";
 		command.Parameters.AddWithValue("senderAddress", _senderAddress);
-		command.Parameters.AddWithValue("messageId", messageId);
-		command.Parameters.AddWithValue("sourceQueue", sourceQueue);
+		FbParameter corrParam = command.Parameters.Add("correlationId", FbDbType.VarChar, 16);
+		FbParameter msgIdParam = command.Parameters.Add("messageId", FbDbType.Text);
+		FbParameter srcParam = command.Parameters.Add("sourceQueue", FbDbType.Text);
 		FbParameter adrParam = command.Parameters.Add("destinationAddress", FbDbType.Text);
 		FbParameter hdrParam = command.Parameters.Add("headers", FbDbType.Text);
 		FbParameter bdyParam = command.Parameters.Add("body", FbDbType.Binary);
@@ -179,10 +177,17 @@ public sealed class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnectio
 		foreach (OutgoingTransportMessage message in outgoingMessages)
 		{
 
-			Messages.TransportMessage transportMessage = message.TransportMessage;
+			TransportMessage transportMessage = message.TransportMessage;
 			var body = message.TransportMessage.Body;
 			var headers = SerializeHeaders(transportMessage.Headers);
 
+			msgIdParam.Value = transportMessage.Headers.TryGetValue(Headers.MessageId, out var id) ? id : DBNull.Value;
+			corrParam.Value = transportMessage.Headers.TryGetValue(Headers.CorrelationId, out var corId)
+				? corId
+				: DBNull.Value;
+			srcParam.Value = transportMessage.Headers.TryGetValue(Headers.SourceQueue, out var srcQueue)
+				? srcQueue
+				: DBNull.Value;
 			adrParam.Value = message.DestinationAddress;
 			hdrParam.Value = headers;
 			bdyParam.Value = body;
