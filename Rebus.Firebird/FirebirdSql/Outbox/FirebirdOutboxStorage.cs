@@ -200,8 +200,8 @@ public sealed class FirebirdOutboxStorage(Func<ITransactionContext, IDbConnectio
 	{
 		using FbCommand command = connection.CreateCommand();
 
-		var idParams = string.Join(", ", messages.Select(m => m.Id));
-		command.CommandText = $"delete from {_tableName} where id in ({idParams})";
+		var ids = string.Join(", ", messages.Select(m => m.Id));
+		command.CommandText = $"delete from {_tableName} where id in ({ids})";
 		var deleted = await command.ExecuteNonQueryAsync();
 
 		await command.ExecuteNonQueryAsync();
