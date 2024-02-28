@@ -30,17 +30,27 @@ internal class OutboxForwarder : IDisposable, IInitializable
 	private readonly ITransport _transport;
 	private readonly IAsyncTask _forwarder;
 	private readonly ILog _logger;
+	private readonly Func<bool, int, Task> _whenSuccessOrError;
 
 	public OutboxForwarder(IAsyncTaskFactory asyncTaskFactory,
 		IRebusLoggerFactory rebusLoggerFactory,
 		IOutboxStorage outboxStorage,
-		ITransport transport)
+		ITransport transport,
+		Func<bool, int, Task>? whenSuccessOrError = default)
 	{
 		ArgumentNullException.ThrowIfNull(asyncTaskFactory);
 		_outboxStorage = outboxStorage;
 		_transport = transport;
 		_forwarder = asyncTaskFactory.Create("OutboxForwarder", RunForwarder, intervalSeconds: 1);
 		_logger = rebusLoggerFactory.GetLogger<OutboxForwarder>();
+		_whenSuccessOrError = whenSuccessOrError ?? DoNothing;
+	}
+
+	public void Dispose()
+	{
+		_cancellationTokenSource.Cancel();
+		_forwarder?.Dispose();
+		_cancellationTokenSource?.Dispose();
 	}
 
 	public void Initialize() => _forwarder.Start();
@@ -85,15 +95,19 @@ internal class OutboxForwarder : IDisposable, IInitializable
 			await SendRetrier.ExecuteAsync(SendMessage, cancellationToken);
 		}
 
-		await scope.CompleteAsync();
+		try
+		{
+			await scope.CompleteAsync();
+		}
+		catch (Exception)
+		{
+			await _whenSuccessOrError(false, batch.Count);
+			throw;
+		}
 
+		await _whenSuccessOrError(true, batch.Count);
 		_logger.Debug("Successfully sent {count} messages", batch.Count);
 	}
 
-	public void Dispose()
-	{
-		_cancellationTokenSource.Cancel();
-		_forwarder?.Dispose();
-		_cancellationTokenSource?.Dispose();
-	}
+	private static Task DoNothing(bool _, int __) => Task.CompletedTask;
 }

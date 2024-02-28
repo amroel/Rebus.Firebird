@@ -20,11 +20,9 @@ public static class FirebirdOutboxConfigurationExtensions
 	/// thus enabling truly idempotent message processing.
 	/// </summary>
 	public static RebusConfigurer Outbox(this RebusConfigurer configurer,
-		Action<StandardConfigurer<IOutboxStorage>> configure)
+		Action<StandardConfigurer<IOutboxStorage>> configure,
+		Func<bool, int, Task>? whenSuccessOrError = default)
 	{
-		ArgumentNullException.ThrowIfNull(configurer);
-		ArgumentNullException.ThrowIfNull(configure);
-
 		configurer.Options(o =>
 		{
 			configure(StandardConfigurer<IOutboxStorage>.GetConfigurerFrom(o));
@@ -43,7 +41,7 @@ public static class FirebirdOutboxConfigurationExtensions
 				IRebusLoggerFactory rebusLoggerFactory = c.Get<IRebusLoggerFactory>();
 				IOutboxStorage outboxStorage = c.Get<IOutboxStorage>();
 				ITransport transport = c.Get<ITransport>();
-				return new OutboxForwarder(asyncTaskFactory, rebusLoggerFactory, outboxStorage, transport);
+				return new OutboxForwarder(asyncTaskFactory, rebusLoggerFactory, outboxStorage, transport, whenSuccessOrError);
 			});
 
 			o.Decorate(c =>
