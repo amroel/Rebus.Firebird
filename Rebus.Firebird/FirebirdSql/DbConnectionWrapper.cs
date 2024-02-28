@@ -4,11 +4,14 @@ using Rebus.Exceptions;
 namespace Rebus.Firebird.FirebirdSql;
 
 /// <summary>
-/// Wrapper of <see cref="FbConnection"/> that allows for either handling <see cref="FbTransaction"/> automatically, or for handling it externally
+/// Wrapper of <see cref="FbConnection"/> that allows for either handling <see cref="FbTransaction"/> automatically, 
+/// or for handling it externally
 /// </summary>
 /// <remarks>
-/// Constructs the wrapper, wrapping the given connection and transaction. It must be indicated with <paramref name="managedExternally"/> whether this wrapper
-/// should commit/rollback the transaction (depending on whether <see cref="Complete"/> is called before <see cref="Dispose()"/>), or if the transaction
+/// Constructs the wrapper, wrapping the given connection and transaction. 
+/// It must be indicated with <paramref name="managedExternally"/> whether this wrapper
+/// should commit/rollback the transaction (depending on whether <see cref="Complete"/> 
+/// is called before <see cref="Dispose()"/>), or if the transaction
 /// is handled outside of the wrapper
 /// </remarks>
 public sealed class DbConnectionWrapper(FbConnection connection,
