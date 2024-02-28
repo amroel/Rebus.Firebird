@@ -68,7 +68,7 @@ public class InsideRebusHandlerTests : FixtureBase
 		flakySenderTransportDecoratorSettings.SuccessRate = 1;
 
 		// wait for AnotherMessage to arrive
-		gotAnotherMessage.WaitOrDie(timeout: TimeSpan.FromSeconds(15));
+		gotAnotherMessage.WaitOrDie(timeout: TimeSpan.FromSeconds(3));
 	}
 
 	private IBus CreateConsumer(string queueName,
