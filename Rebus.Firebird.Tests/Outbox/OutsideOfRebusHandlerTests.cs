@@ -244,6 +244,6 @@ public class OutsideOfRebusHandlerTests : FixtureBase
 				}
 			})
 			.Routing(r => routing?.Invoke(r))
-			.Outbox(o => o.StoreInFirebird(ConnectionString, "RebusOutbox"))
+			.Outbox(o => o.StoreInFirebird(ConnectionString, "OneWayClient", "RebusOutbox"))
 			.Start();
 }

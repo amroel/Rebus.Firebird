@@ -17,13 +17,15 @@ public static class OutboxExtensions
 	/// </summary>
 	public static void StoreInFirebird(this StandardConfigurer<IOutboxStorage> configurer,
 		string connectionString,
-		string tableName) => StoreInFirebird(configurer, connectionString, new TableName(tableName));
+		string senderAddress,
+		string tableName) => StoreInFirebird(configurer, connectionString, senderAddress, new TableName(tableName));
 
 	/// <summary>
 	/// Configures Firebird Server as the outbox storage
 	/// </summary>
 	public static void StoreInFirebird(this StandardConfigurer<IOutboxStorage> configurer,
 		string connectionString,
+		string senderAddress,
 		TableName tableName)
 	{
 		IDbConnection ConnectionProvider(ITransactionContext context)
@@ -53,7 +55,7 @@ public static class OutboxExtensions
 
 		configurer
 			.OtherService<IOutboxStorage>()
-			.Register(_ => new FirebirdOutboxStorage(ConnectionProvider, tableName));
+			.Register(_ => new FirebirdOutboxStorage(ConnectionProvider, senderAddress, tableName));
 
 		configurer.OtherService<IProvideOutboxConnection>()
 			.Register(_ => new OutboxConnectionProvider(connectionString));

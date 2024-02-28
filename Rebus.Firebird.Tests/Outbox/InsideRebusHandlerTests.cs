@@ -90,7 +90,7 @@ public class InsideRebusHandlerTests : FixtureBase
 						flakySenderTransportDecoratorSettings));
 				}
 			})
-			.Outbox(o => o.StoreInFirebird(ConnectionString, "RebusOutbox"))
+			.Outbox(o => o.StoreInFirebird(ConnectionString, queueName, "RebusOutbox"))
 			.Start();
 
 		return activator.Bus;

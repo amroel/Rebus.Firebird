@@ -11,7 +11,7 @@ namespace Rebus.Firebird.Tests.Outbox;
 [TestFixture]
 public class FirebirdOutboxStorageTests : FixtureBase
 {
-	private FirebirdOutboxStorage _storage = new(GetNewDbConnection, new("silly"));
+	private FirebirdOutboxStorage _storage = new(GetNewDbConnection, "", new("silly"));
 
 	protected override void SetUp()
 	{
@@ -20,7 +20,7 @@ public class FirebirdOutboxStorageTests : FixtureBase
 		const string tableName = "Outbox";
 		FbTestHelper.DropTable(tableName);
 
-		_storage = new FirebirdOutboxStorage(GetNewDbConnection, new TableName(tableName));
+		_storage = new FirebirdOutboxStorage(GetNewDbConnection, "sender", new TableName(tableName));
 		_storage.Initialize();
 	}
 
