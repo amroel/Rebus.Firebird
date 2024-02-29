@@ -3,7 +3,7 @@
 /// <summary>
 /// Mini-Polly 🙂
 /// </summary>
-internal class Retrier
+internal sealed class Retrier
 {
 	private readonly List<TimeSpan> _delays;
 
@@ -14,7 +14,9 @@ internal class Retrier
 		_delays = delays.ToList();
 	}
 
-	public async Task ExecuteAsync(Func<Task> execute, CancellationToken cancellationToken = default)
+	public async Task ExecuteAsync(Func<Task> execute,
+		Action<int> retryAttempt,
+		CancellationToken cancellationToken = default)
 	{
 		for (var index = 0; index <= _delays.Count; index++)
 		{
@@ -30,6 +32,7 @@ internal class Retrier
 					throw;
 				}
 
+				retryAttempt(index + 1);
 				TimeSpan delay = _delays[index];
 
 				try

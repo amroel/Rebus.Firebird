@@ -3,7 +3,8 @@
 namespace Rebus.Firebird.FirebirdSql.Outbox;
 
 /// <summary>
-/// Wraps a batch of <see cref="OutboxMessage"/>s along with a function that "completes" the batch (i.e. ensures that it will not be handled again -... e.g. by deleting it, or marking it as completed)
+/// Wraps a batch of <see cref="OutboxMessage"/>s along with a function that "completes" the batch 
+/// (i.e. ensures that it will not be handled again -... e.g. by deleting it, or marking it as completed)
 /// </summary>
 /// <remarks>
 /// Creates the batch
@@ -13,7 +14,8 @@ public sealed class OutboxMessageBatch(Func<Task> completionFunction,
 	Action disposeFunction) : IDisposable, IReadOnlyList<OutboxMessage>
 {
 	/// <summary>
-	/// Gets an empty outbox message batch that doesn't complete anything and only performs some kind of cleanup when done
+	/// Gets an empty outbox message batch that doesn't complete anything 
+	/// and only performs some kind of cleanup when done
 	/// </summary>
 	public static OutboxMessageBatch Empty(Action disposeFunction)
 		=> new(() => Task.CompletedTask, Array.Empty<OutboxMessage>(), disposeFunction);

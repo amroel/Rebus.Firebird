@@ -1,11 +1,10 @@
 ﻿using Rebus.Bus;
-using Rebus.Logging;
 using Rebus.Threading;
 using Rebus.Transport;
 
 namespace Rebus.Firebird.FirebirdSql.Outbox;
 
-internal class OutboxForwarder : IDisposable, IInitializable
+internal sealed class OutboxForwarder : IDisposable, IInitializable
 {
 	private static readonly Retrier SendRetrier = new(new[]
 	{
@@ -29,21 +28,18 @@ internal class OutboxForwarder : IDisposable, IInitializable
 	private readonly IOutboxStorage _outboxStorage;
 	private readonly ITransport _transport;
 	private readonly IAsyncTask _forwarder;
-	private readonly ILog _logger;
-	private readonly Func<bool, int, Task> _whenSuccessOrError;
+	private readonly IReportOutboxOperations _reporter;
 
 	public OutboxForwarder(IAsyncTaskFactory asyncTaskFactory,
-		IRebusLoggerFactory rebusLoggerFactory,
 		IOutboxStorage outboxStorage,
 		ITransport transport,
-		Func<bool, int, Task>? whenSuccessOrError = default)
+		IReportOutboxOperations reporter)
 	{
 		ArgumentNullException.ThrowIfNull(asyncTaskFactory);
 		_outboxStorage = outboxStorage;
 		_transport = transport;
 		_forwarder = asyncTaskFactory.Create("OutboxForwarder", RunForwarder, intervalSeconds: 1);
-		_logger = rebusLoggerFactory.GetLogger<OutboxForwarder>();
-		_whenSuccessOrError = whenSuccessOrError ?? DoNothing;
+		_reporter = reporter;
 	}
 
 	public void Dispose()
@@ -57,7 +53,7 @@ internal class OutboxForwarder : IDisposable, IInitializable
 
 	private async Task RunForwarder()
 	{
-		_logger.Debug("Checking outbox storage for pending messages");
+		_reporter.ReportChecking();
 
 		CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
@@ -67,7 +63,7 @@ internal class OutboxForwarder : IDisposable, IInitializable
 
 			if (batch.Count == 0)
 			{
-				_logger.Debug("No pending messages found");
+				_reporter.ReportNoPendingMessages();
 				return;
 			}
 
@@ -80,7 +76,7 @@ internal class OutboxForwarder : IDisposable, IInitializable
 	private async Task ProcessMessageBatch(IReadOnlyCollection<OutboxMessage> batch,
 		CancellationToken cancellationToken)
 	{
-		_logger.Debug("Sending {count} pending messages", batch.Count);
+		_reporter.ReportSending(batch.Count);
 
 		using RebusTransactionScope scope = new();
 
@@ -92,7 +88,7 @@ internal class OutboxForwarder : IDisposable, IInitializable
 
 			Task SendMessage() => _transport.Send(destinationAddress, transportMessage, transactionContext);
 
-			await SendRetrier.ExecuteAsync(SendMessage, cancellationToken);
+			await SendRetrier.ExecuteAsync(SendMessage, _reporter.ReportRetrying, cancellationToken);
 		}
 
 		try
@@ -101,13 +97,10 @@ internal class OutboxForwarder : IDisposable, IInitializable
 		}
 		catch (Exception)
 		{
-			await _whenSuccessOrError(false, batch.Count);
+			_reporter.ReportSendingFailed(batch.Count);
 			throw;
 		}
 
-		await _whenSuccessOrError(true, batch.Count);
-		_logger.Debug("Successfully sent {count} messages", batch.Count);
+		_reporter.ReportSent(batch.Count);
 	}
-
-	private static Task DoNothing(bool _, int __) => Task.CompletedTask;
 }

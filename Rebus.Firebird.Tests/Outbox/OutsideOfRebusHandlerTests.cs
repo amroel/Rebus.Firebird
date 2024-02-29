@@ -18,7 +18,6 @@ public class OutsideOfRebusHandlerTests : FixtureBase
 	private static string ConnectionString => FbTestHelper.ConnectionString;
 
 	private InMemNetwork _network = new();
-	private bool _reportedSuccess;
 
 	protected override void SetUp()
 	{
@@ -48,7 +47,6 @@ public class OutsideOfRebusHandlerTests : FixtureBase
 	[TestCase(false, false)]
 	public async Task CanUseOutboxOutsideOfRebusHandler_Publish(bool commitTransaction, bool expectMessageToBeReceived)
 	{
-		_reportedSuccess = !expectMessageToBeReceived;
 		FlakySenderTransportDecoratorSettings settings = new();
 
 		using ManualResetEvent messageWasReceived = new(initialState: false);
@@ -86,13 +84,9 @@ public class OutsideOfRebusHandlerTests : FixtureBase
 		// we would not have gotten this far without the outbox - now let's pretend that the transport has recovered
 		settings.SuccessRate = 1;
 
-		Assert.Multiple(() =>
-		{
-			// wait for server to receive the event
-			Assert.That(messageWasReceived.WaitOne(TimeSpan.FromSeconds(2)), Is.EqualTo(expectMessageToBeReceived),
-				$"When commitTransaction={commitTransaction} we {(expectMessageToBeReceived ? "expected the message to be sent and thus received" : "did NOT expect the message to be sent and therefore also not received")}");
-			Assert.That(_reportedSuccess, Is.EqualTo(expectMessageToBeReceived));
-		});
+		// wait for server to receive the event
+		Assert.That(messageWasReceived.WaitOne(TimeSpan.FromSeconds(2)), Is.EqualTo(expectMessageToBeReceived),
+			$"When commitTransaction={commitTransaction} we {(expectMessageToBeReceived ? "expected the message to be sent and thus received" : "did NOT expect the message to be sent and therefore also not received")}");
 	}
 
 	[TestCase(true, true)]
@@ -142,7 +136,6 @@ public class OutsideOfRebusHandlerTests : FixtureBase
 	[TestCase(false, false)]
 	public async Task CanUseOutboxOutsideOfRebusHandler_Send(bool commitTransaction, bool expectMessageToBeReceived)
 	{
-		_reportedSuccess = !expectMessageToBeReceived;
 		FlakySenderTransportDecoratorSettings settings = new();
 
 		using ManualResetEvent messageWasReceived = new(initialState: false);
@@ -179,13 +172,9 @@ public class OutsideOfRebusHandlerTests : FixtureBase
 		// we would not have gotten this far without the outbox - now let's pretend that the transport has recovered
 		settings.SuccessRate = 1;
 
-		Assert.Multiple(() =>
-		{
-			// wait for server to receive the event
-			Assert.That(messageWasReceived.WaitOne(TimeSpan.FromSeconds(2)), Is.EqualTo(expectMessageToBeReceived),
-				$"When commitTransaction={commitTransaction} we {(expectMessageToBeReceived ? "expected the message to be sent and thus received" : "did NOT expect the message to be sent and therefore also not received")}");
-			Assert.That(_reportedSuccess, Is.EqualTo(expectMessageToBeReceived));
-		});
+		// wait for server to receive the event
+		Assert.That(messageWasReceived.WaitOne(TimeSpan.FromSeconds(2)), Is.EqualTo(expectMessageToBeReceived),
+			$"When commitTransaction={commitTransaction} we {(expectMessageToBeReceived ? "expected the message to be sent and thus received" : "did NOT expect the message to be sent and therefore also not received")}");
 	}
 
 	[TestCase(true, true)]
@@ -255,12 +244,6 @@ public class OutsideOfRebusHandlerTests : FixtureBase
 				}
 			})
 			.Routing(r => routing?.Invoke(r))
-			.Outbox(o => o.StoreInFirebird(ConnectionString, "OneWayClient", "RebusOutbox"), WhenSuccessOrError)
+			.Outbox(o => o.StoreInFirebird(ConnectionString, "OneWayClient", "RebusOutbox"))
 			.Start();
-
-	private Task WhenSuccessOrError(bool success, int messageCount)
-	{
-		_reportedSuccess = success;
-		return Task.CompletedTask;
-	}
 }

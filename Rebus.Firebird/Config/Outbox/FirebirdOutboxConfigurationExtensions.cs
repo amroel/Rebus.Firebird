@@ -21,7 +21,7 @@ public static class FirebirdOutboxConfigurationExtensions
 	/// </summary>
 	public static RebusConfigurer Outbox(this RebusConfigurer configurer,
 		Action<StandardConfigurer<IOutboxStorage>> configure,
-		Func<bool, int, Task>? whenSuccessOrError = default)
+		IReportOutboxOperations? outboxReporter = default)
 	{
 		configurer.Options(o =>
 		{
@@ -41,7 +41,11 @@ public static class FirebirdOutboxConfigurationExtensions
 				IRebusLoggerFactory rebusLoggerFactory = c.Get<IRebusLoggerFactory>();
 				IOutboxStorage outboxStorage = c.Get<IOutboxStorage>();
 				ITransport transport = c.Get<ITransport>();
-				return new OutboxForwarder(asyncTaskFactory, rebusLoggerFactory, outboxStorage, transport, whenSuccessOrError);
+				ILog outboxLogger = rebusLoggerFactory.GetLogger<OutboxForwarder>();
+				IReportOutboxOperations reporter = outboxReporter is null
+					? new LogOutboxOperationsReporter(outboxLogger)
+					: new LogOutboxOperationsDecorator(outboxLogger, outboxReporter);
+				return new OutboxForwarder(asyncTaskFactory, outboxStorage, transport, reporter);
 			});
 
 			o.Decorate(c =>
