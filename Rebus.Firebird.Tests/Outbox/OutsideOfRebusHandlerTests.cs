@@ -151,22 +151,20 @@ public class OutsideOfRebusHandlerTests : FixtureBase
 		settings.SuccessRate = 0;
 
 		// pretending we're in a web app - we have these two bad boys at work:
-		await using (FbConnection connection = new(ConnectionString))
+		await using FbConnection connection = new(ConnectionString);
+		await connection.OpenAsync();
+		await using FbTransaction transaction = await connection.BeginTransactionAsync();
+
+		// this is how we would use the outbox for outgoing messages
+		using RebusTransactionScope scope = new();
+		scope.UseOutbox(connection, transaction);
+		await client.Send(new SomeMessage());
+		await scope.CompleteAsync();
+
+		if (commitTransaction)
 		{
-			await connection.OpenAsync();
-			await using FbTransaction transaction = await connection.BeginTransactionAsync();
-
-			// this is how we would use the outbox for outgoing messages
-			using RebusTransactionScope scope = new();
-			scope.UseOutbox(connection, transaction);
-			await client.Send(new SomeMessage());
-			await scope.CompleteAsync();
-
-			if (commitTransaction)
-			{
-				// this is what we were all waiting for!
-				await transaction.CommitAsync();
-			}
+			// this is what we were all waiting for!
+			await transaction.CommitAsync();
 		}
 
 		// we would not have gotten this far without the outbox - now let's pretend that the transport has recovered
