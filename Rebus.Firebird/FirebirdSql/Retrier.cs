@@ -22,6 +22,8 @@ internal sealed class Retrier
 		{
 			try
 			{
+				if (index > 0)
+					retryAttempt(index + 1);
 				await execute();
 				return;
 			}
@@ -32,7 +34,6 @@ internal sealed class Retrier
 					throw;
 				}
 
-				retryAttempt(index + 1);
 				TimeSpan delay = _delays[index];
 
 				try
