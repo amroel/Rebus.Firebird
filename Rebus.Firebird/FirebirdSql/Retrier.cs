@@ -16,7 +16,7 @@ internal sealed class Retrier(List<TimeSpan> delays)
 			try
 			{
 				if (index > 0)
-					retryAttempt(index + 1);
+					retryAttempt(index);
 				await execute();
 				return;
 			}
