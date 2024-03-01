@@ -1,10 +1,9 @@
 # Rebus.Firebird
-![](https://raw.githubusercontent.com/amroel/Rebus.Firebird/main/artwork/little_rebusbus2_copy-200x200.png)
-![](https://raw.githubusercontent.com/amroel/Rebus.Firebird/main/artwork/firebird-logo-200.png)
+![](https://raw.githubusercontent.com/amroel/Rebus.Firebird/main/artwork/little_rebusbus2_copy-200x200.png)![](https://raw.githubusercontent.com/amroel/Rebus.Firebird/main/artwork/firebird-logo-200.png)
 
 [![install from nuget](https://img.shields.io/nuget/v/Rebus.Firebird.svg?style=flat-square)](https://www.nuget.org/packages/Rebus.Firebird)
 
-Currently Provides only a FirebirdSQL-based outbox persistence for [Rebus](https://github.com/rebus-org/Rebus) 
+Currently Provides only a [FirebirdSQL-based](https://firebirdsql.org/) outbox persistence for [Rebus](https://github.com/rebus-org/Rebus) 
 
 ## Configuration
 
