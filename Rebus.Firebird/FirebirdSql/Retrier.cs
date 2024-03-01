@@ -3,16 +3,9 @@
 /// <summary>
 /// Mini-Polly 🙂
 /// </summary>
-internal sealed class Retrier
+internal sealed class Retrier(List<TimeSpan> delays)
 {
-	private readonly List<TimeSpan> _delays;
-
-	public Retrier(IEnumerable<TimeSpan> delays)
-	{
-		ArgumentNullException.ThrowIfNull(delays);
-
-		_delays = delays.ToList();
-	}
+	private readonly List<TimeSpan> _delays = delays;
 
 	public async Task ExecuteAsync(Func<Task> execute,
 		Action<int> retryAttempt,

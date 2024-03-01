@@ -6,8 +6,8 @@ namespace Rebus.Firebird.FirebirdSql.Outbox;
 
 internal sealed class OutboxForwarder : IDisposable, IInitializable
 {
-	private static readonly Retrier SendRetrier = new(new[]
-	{
+	private static readonly Retrier SendRetrier = new(
+	[
 		TimeSpan.FromSeconds(0.1),
 		TimeSpan.FromSeconds(0.1),
 		TimeSpan.FromSeconds(0.1),
@@ -23,7 +23,7 @@ internal sealed class OutboxForwarder : IDisposable, IInitializable
 		TimeSpan.FromSeconds(1),
 		TimeSpan.FromSeconds(1),
 		TimeSpan.FromSeconds(1),
-	});
+	]);
 	private readonly CancellationTokenSource _cancellationTokenSource = new();
 	private readonly IOutboxStorage _outboxStorage;
 	private readonly ITransport _transport;
