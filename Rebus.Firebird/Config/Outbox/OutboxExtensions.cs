@@ -1,4 +1,5 @@
-﻿using FirebirdSql.Data.FirebirdClient;
+﻿using System.Transactions;
+using FirebirdSql.Data.FirebirdClient;
 using Rebus.Firebird.FirebirdSql;
 using Rebus.Firebird.FirebirdSql.Outbox;
 using Rebus.Transport;
@@ -42,7 +43,9 @@ public static class OutboxExtensions
 
 			try
 			{
-				FbTransaction transaction = connection.BeginTransaction();
+				FbTransaction? transaction = Transaction.Current is null
+					? connection.BeginTransaction()
+					: null;
 
 				return new DbConnectionWrapper(connection, transaction, managedExternally: false);
 			}
