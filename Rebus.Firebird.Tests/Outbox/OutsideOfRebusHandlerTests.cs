@@ -114,6 +114,8 @@ public class OutsideOfRebusHandlerTests : FixtureBase
 		// pretending we're in a web app - we have these two bad boys at work:
 		using (TransactionScope tx = new(TransactionScopeAsyncFlowOption.Enabled))
 		{
+			await using FbConnection connection = new(ConnectionString);
+			await connection.OpenAsync();
 			// this is how we would use the outbox for outgoing messages
 			await client.Publish(new SomeMessage());
 
@@ -197,6 +199,8 @@ public class OutsideOfRebusHandlerTests : FixtureBase
 		// pretending we're in a web app - we have these two bad boys at work:
 		using (TransactionScope tx = new(TransactionScopeAsyncFlowOption.Enabled))
 		{
+			await using FbConnection connection = new(ConnectionString);
+			await connection.OpenAsync();
 
 			await client.Send(new SomeMessage());
 
