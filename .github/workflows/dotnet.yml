@@ -1,4 +1,4 @@
-# This workflow will build a .NET project
+﻿# This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
 name: .NET
@@ -23,11 +23,11 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
     
     - name: Build Version
       run: |
-        dotnet tool install --global minver-cli --version 4.3.0
+        dotnet tool install --global minver-cli --version 6.0.0
         version=$(minver --tag-prefix v)
         echo "MINVERVERSIONOVERRIDE=$version" >> $GITHUB_ENV
         echo "### Version: $version" >> $GITHUB_STEP_SUMMARY
