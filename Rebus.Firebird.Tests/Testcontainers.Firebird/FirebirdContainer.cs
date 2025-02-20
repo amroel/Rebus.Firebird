@@ -1,5 +1,4 @@
 ﻿using DotNet.Testcontainers.Containers;
-using Microsoft.Extensions.Logging;
 
 namespace Rebus.Firebird.Tests.Testcontainers.Firebird;
 
@@ -8,8 +7,7 @@ namespace Rebus.Firebird.Tests.Testcontainers.Firebird;
 /// </summary>
 /// <param name="configuration">The container configuration.</param>
 /// <param name="logger">The logger.</param>
-public class FirebirdContainer(FirebirdConfiguration configuration, ILogger logger)
-	: DockerContainer(configuration, logger)
+public class FirebirdContainer(FirebirdConfiguration configuration) : DockerContainer(configuration)
 {
 	private readonly FirebirdConfiguration _cfg = configuration;
 

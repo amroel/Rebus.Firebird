@@ -74,7 +74,7 @@ public sealed class FirebirdBuilder : ContainerBuilder<FirebirdBuilder, Firebird
 	public override FirebirdContainer Build()
 	{
 		Validate();
-		return new FirebirdContainer(DockerResourceConfiguration, TestcontainersSettings.Logger);
+		return new FirebirdContainer(DockerResourceConfiguration);
 	}
 
 	/// <inheritdoc />
