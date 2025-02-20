@@ -6,10 +6,6 @@ internal sealed class LogOutboxOperationsReporter(ILog outboxLogger) : IReportOu
 {
 	private readonly ILog _outboxLogger = outboxLogger;
 
-	public void ReportChecking() => _outboxLogger.Debug("Checking outbox storage for pending messages");
-
-	public void ReportNoPendingMessages() => _outboxLogger.Debug("No pending messages found in outbox storage");
-
 	public void ReportSending(int count) => _outboxLogger.Debug("Sending {0} messages from outbox", count);
 
 	public void ReportRetrying(int attempt)

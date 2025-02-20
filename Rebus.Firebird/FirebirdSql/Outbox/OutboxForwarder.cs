@@ -53,8 +53,6 @@ internal sealed class OutboxForwarder : IDisposable, IInitializable
 
 	private async Task RunForwarder()
 	{
-		_reporter.ReportChecking();
-
 		CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
 		while (!cancellationToken.IsCancellationRequested)
@@ -63,7 +61,6 @@ internal sealed class OutboxForwarder : IDisposable, IInitializable
 
 			if (batch.Count == 0)
 			{
-				_reporter.ReportNoPendingMessages();
 				return;
 			}
 
@@ -73,8 +70,7 @@ internal sealed class OutboxForwarder : IDisposable, IInitializable
 		}
 	}
 
-	private async Task ProcessMessageBatch(IReadOnlyCollection<OutboxMessage> batch,
-		CancellationToken cancellationToken)
+	private async Task ProcessMessageBatch(OutboxMessageBatch batch, CancellationToken cancellationToken)
 	{
 		_reporter.ReportSending(batch.Count);
 

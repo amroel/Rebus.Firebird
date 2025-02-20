@@ -7,18 +7,6 @@ internal sealed class LogOutboxOperationsDecorator(ILog outboxLogger, IReportOut
 	private readonly ILog _outboxLogger = outboxLogger;
 	private readonly IReportOutboxOperations _inner = inner;
 
-	public void ReportChecking()
-	{
-		_outboxLogger.Debug("Checking outbox storage for pending messages");
-		_inner.ReportChecking();
-	}
-
-	public void ReportNoPendingMessages()
-	{
-		_outboxLogger.Debug("No pending messages found in outbox storage");
-		_inner.ReportNoPendingMessages();
-	}
-
 	public void ReportSending(int count)
 	{
 		_outboxLogger.Debug("Sending {0} messages from outbox", count);
